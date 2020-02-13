@@ -218,9 +218,11 @@ class ViberDriver extends HttpDriver
 				} elseif ($attachmentType == 'video' && $attachment instanceof Video) {
 					$template = new VideoTemplate($attachment->getUrl());
 				} elseif ($attachmentType == 'audio' && $attachment instanceof Audio) {
-					$template = new FileTemplate($attachment->getUrl(), uniqid().(($ext=pathinfo($attachment->getUrl(), PATHINFO_EXTENSION))?'.'.$ext:''));
+					$fileName = $parameters['file_name'] ?? uniqid();
+					$template = new FileTemplate($attachment->getUrl(), $fileName.(($ext=pathinfo($attachment->getUrl(), PATHINFO_EXTENSION))?'.'.$ext:''));
 				} elseif ($attachmentType == 'file' && $attachment instanceof File) {
-					$template = new FileTemplate($attachment->getUrl(), uniqid().(($ext=pathinfo($attachment->getUrl(), PATHINFO_EXTENSION))?'.'.$ext:''));
+					$fileName = $parameters['file_name'] ?? uniqid();
+					$template = new FileTemplate($attachment->getUrl(), $fileName.(($ext=pathinfo($attachment->getUrl(), PATHINFO_EXTENSION))?'.'.$ext:''));
 				} elseif ($attachmentType == 'location' && $attachment instanceof Location) {
 					$template = new LocationTemplate($attachment->getLatitude(), $attachment->getLongitude());
 				}

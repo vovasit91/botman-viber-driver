@@ -155,40 +155,48 @@ class ViberDriver extends HttpDriver
 		if ($user === null) {
 			return [];
 		}
-		if (isset($this->payload->get('message')['text'])) {
-			$message = new IncomingMessage($this->payload->get('message')['text'], $user, $this->getBotId(), $this->payload);
-		} elseif ($this->payload->get('message')['type'] == 'location') {
-			$message = new IncomingMessage(Location::PATTERN, $user, $this->getBotId(), $this->payload);
-			$message->setLocation(
-				new Location(
-					$this->payload->get('message')['location']['lat'],
-					$this->payload->get('message')['location']['lon'],
-					$this->payload->get('message')['location']
-				)
-			);
-		} elseif ($this->payload->get('message')['type'] == 'picture') {
-			$message = new IncomingMessage(Image::PATTERN, $user, $this->getBotId(), $this->payload);
-			$message->setImages([
-				(new Image(
-					$this->payload->get('message')['media'],
-					$this->payload->get('message')
-				))
-					->addExtras('size', $this->payload->get('message')['size'] ?? '')
-					->addExtras('file_name', $this->payload->get('message')['file_name'] ?? '')
-					->addExtras('thumbnail', $this->payload->get('message')['thumbnail'] ?? '')
-			]);
-		} elseif ($this->payload->get('message')['type'] == 'contact') {
-			$message = new IncomingMessage(Contact::PATTERN, $user, $this->getBotId(), $this->payload);
-			$message->addExtras('contact',
-				new Contact(
-					$this->payload->get('message')['contact']['phone_number'],
-					$this->payload->get('message')['contact']['name'] ?? ''
-				)
-			);
-		} else {
-			$message = new IncomingMessage('', $user, $this->getBotId(), $this->payload);
+
+		if (isset($this->payload->get('message')['type'])) {
+			if ($this->payload->get('message')['type'] == 'text') {
+				$message = new IncomingMessage($this->payload->get('message')['text'], $user, $this->getBotId(), $this->payload);
+			} elseif ($this->payload->get('message')['type'] == 'location') {
+				$message = new IncomingMessage(Location::PATTERN, $user, $this->getBotId(), $this->payload);
+				$message->setLocation(
+					new Location(
+						$this->payload->get('message')['location']['lat'],
+						$this->payload->get('message')['location']['lon'],
+						$this->payload->get('message')['location']
+					)
+				);
+			} elseif ($this->payload->get('message')['type'] == 'picture') {
+				$message = new IncomingMessage(Image::PATTERN, $user, $this->getBotId(), $this->payload);
+				$message->setImages([
+					(new Image(
+						$this->payload->get('message')['media'],
+						$this->payload->get('message')
+					))
+						->addExtras('size', $this->payload->get('message')['size'] ?? '')
+						->addExtras('file_name', $this->payload->get('message')['file_name'] ?? '')
+						->addExtras('thumbnail', $this->payload->get('message')['thumbnail'] ?? '')
+				]);
+			} elseif ($this->payload->get('message')['type'] == 'contact') {
+				$message = new IncomingMessage(Contact::PATTERN, $user, $this->getBotId(), $this->payload);
+				$message->addExtras('contact',
+					new Contact(
+						$this->payload->get('message')['contact']['phone_number'],
+						$this->payload->get('message')['contact']['name'] ?? ''
+					)
+				);
+			}
 		}
 
+		if (!isset($message)) {
+			if (isset($this->payload->get('message')['text'])) {
+				$message = new IncomingMessage($this->payload->get('message')['text'], $user, $this->getBotId(), $this->payload);
+			} else {
+				$message = new IncomingMessage('', $user, $this->getBotId(), $this->payload);
+			}
+		}
 		return [$message];
 	}
 

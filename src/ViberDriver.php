@@ -225,6 +225,7 @@ class ViberDriver extends HttpDriver
 	{
 		$parameters = array_merge_recursive([
 			'receiver' => $matchingMessage->getSender(),
+			'min_api_version' => 8
 		], $additionalParameters);
 
 		if ($message instanceof Question) {

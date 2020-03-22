@@ -18,6 +18,7 @@ use BotMan\BotMan\Messages\Attachments\Image;
 use BotMan\BotMan\Messages\Attachments\Location;
 use BotMan\BotMan\Messages\Attachments\Video;
 use BotMan\BotMan\Messages\Outgoing\OutgoingMessage;
+use TheArdent\Drivers\Viber\Attachments\Contact;
 use TheArdent\Drivers\Viber\Events\MessageDelivered;
 use TheArdent\Drivers\Viber\Events\MessageFailed;
 use TheArdent\Drivers\Viber\Events\MessageSeen;
@@ -163,6 +164,25 @@ class ViberDriver extends HttpDriver
 					$this->payload->get('message')['location']['lat'],
 					$this->payload->get('message')['location']['lon'],
 					$this->payload->get('message')['location']
+				)
+			);
+		} elseif ($this->payload->get('message')['type'] == 'picture') {
+			$message = new IncomingMessage(Image::PATTERN, $user, $this->getBotId(), $this->payload);
+			$message->setImages([
+				(new Image(
+					$this->payload->get('message')['media'],
+					$this->payload->get('message')
+				))
+					->addExtras('size', $this->payload->get('message')['size'] ?? '')
+					->addExtras('file_name', $this->payload->get('message')['file_name'] ?? '')
+					->addExtras('thumbnail', $this->payload->get('message')['thumbnail'] ?? '')
+			]);
+		} elseif ($this->payload->get('message')['type'] == 'contact') {
+			$message = new IncomingMessage(Contact::PATTERN, $user, $this->getBotId(), $this->payload);
+			$message->addExtras('contact',
+				new Contact(
+					$this->payload->get('message')['contact']['phone_number'],
+					$this->payload->get('message')['contact']['name'] ?? ''
 				)
 			);
 		} else {

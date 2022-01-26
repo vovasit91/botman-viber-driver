@@ -298,7 +298,7 @@ class ViberDriver extends HttpDriver
 	public function getUser(IncomingMessage $matchingMessage)
 	{
 		$personId = $matchingMessage->getSender();
-		$response = $this->http->post(self::API_ENDPOINT.'get_user_details',[],['id' => $personId], $this->getHeaders());
+		$response = $this->http->post(self::API_ENDPOINT.'get_user_details',[],['id' => $personId], $this->getHeaders(), true);
 		$userInfo = Collection::make(json_decode($response->getContent(), true)['user']);
 
 		return new User($userInfo->get('id'), $userInfo->get('name'), null, $userInfo->get('name'), $userInfo->toArray());
